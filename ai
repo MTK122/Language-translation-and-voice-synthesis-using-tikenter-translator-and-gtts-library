@@ -1,0 +1,97 @@
+import tkinter as tk
+from translate import Translator
+from gtts import gTTS
+import os
+
+def translate_language():
+    text_to_translate = entry_window.get()
+    selected_language = drop_down.get()
+
+    language_codes = {
+        "English": "en",
+        "Spanish": "es",
+        "German": "de",
+        "French": "fr",
+        "Italian": "it",
+        "Portuguese": "pt",
+        "Russian": "ru",
+        "Japanese": "ja",
+        "Korean": "ko",
+        "Dutch": "nl",
+        "Greek": "el",
+        "Hebrew": "he",
+        "Polish": "pl",
+        "Swedish": "sv",
+        "Turkish": "tr",
+        "Vietnamese": "vi",
+        "Indonesian": "id"
+    }
+
+    dest_lang = language_codes.get(selected_language, "en")
+
+    try:
+        translator = Translator(to_lang=dest_lang)
+        translated_text = translator.translate(text_to_translate)
+        translated_label.config(text=translated_text)
+        voice_output(translated_text, dest_lang)  # Output translated text using voice synthesis
+    except Exception as e:
+        translated_label.config(text="Translation Error: " + str(e))
+
+def voice_output(text, lang):
+    tts = gTTS(text=text, lang=lang)
+    tts.save("output.mp3")
+    # Display a download link for the audio file
+    download_link.config(text="Download Audio", command=download_audio)
+
+def download_audio():
+    # Provide the link to download the generated audio file
+    os.system("mv output.mp3 static/output.mp3")
+    download_link.config(text="Download Audio", state="disabled")
+
+tk_window = tk.Tk()
+tk_window.geometry("700x400")
+tk_window.config(bg="#F0F0F0")  # Set background color
+
+lang_options = [
+    "English",
+    "Spanish",
+    "German",
+    "French",
+    "Italian",
+    "Portuguese",
+    "Russian",
+    "Japanese",
+    "Korean",
+    "Dutch",
+    "Greek",
+    "Hebrew",
+    "Polish",
+    "Swedish",
+    "Turkish",
+    "Vietnamese",
+    "Indonesian"
+]
+
+# Adjusted font sizes
+font_style = ("Arial", 16)
+
+entry_window = tk.Entry(tk_window, bg="white", fg="black", font=font_style)
+entry_window.place(x=28, y=60, width=300)
+
+drop_down = tk.StringVar(tk_window)
+drop_down.set("Select Language")
+
+list_lang = tk.OptionMenu(tk_window, drop_down, *lang_options)
+list_lang.configure(bg="white", fg="black", font=font_style)
+list_lang.place(x=350, y=55)
+
+translate_button = tk.Button(tk_window, text="Translate", bg="#4CAF50", fg="white", font=font_style, command=translate_language)
+translate_button.place(x=280, y=100)
+
+translated_label = tk.Label(tk_window, text="", bg="white", fg="black", font=font_style)
+translated_label.place(x=28, y=160, width=650)
+
+download_link = tk.Button(tk_window, text="Download Audio", bg="#4CAF50", fg="white", font=font_style)
+download_link.place(x=280, y=200)
+
+tk_window.mainloop()
